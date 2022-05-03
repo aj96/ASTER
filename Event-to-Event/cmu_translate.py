@@ -27,9 +27,9 @@ See the following papers for more information on neural translation models.
  * http://arxiv.org/abs/1409.0473
  * http://arxiv.org/abs/1412.2007
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+
+
+
 
 import math
 import os
@@ -187,7 +187,7 @@ def train():
 				print("The number of epochs is:{}".format(epochs))
 				print ("The step_loss is: ",float(step_loss))
 				print ("The loss is: ",float(loss))
-				print
+				print()
 				step_time, loss = 0.0, 0.0
 				# Decrease learning rate if no improvement was seen over last 3 times.
 				if len(previous_losses) > 2 and loss > max(previous_losses[-3:]):
@@ -362,7 +362,7 @@ def self_test():
 		# Fake data set for both the (3, 3) and (6, 6) bucket.
 		data_set = ([([1, 1], [2, 2]), ([3, 3], [4]), ([5], [6])],
 								[([1, 1, 1, 1, 1], [2, 2, 2, 2, 2]), ([3, 3, 3], [5, 6])])
-		for _ in xrange(5):	# Train the fake model for 5 steps.
+		for _ in range(5):	# Train the fake model for 5 steps.
 			bucket_id = random.choice([0, 1])
 			encoder_inputs, decoder_inputs, target_weights = model.get_batch(
 					data_set, bucket_id)

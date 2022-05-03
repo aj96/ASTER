@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import division, unicode_literals
+
 import argparse
 import random
 import re
@@ -67,13 +67,13 @@ class Ngrams:
         self.python2 = sys.version_info < (3,)
 
     def error_handler(self, error_code):
-        print("Error: " + {
+        print(("Error: " + {
             3: ("1st line of the file doesn't define categories; cannot "
                 "classify. Ex: 'category1, category2 ,\u2026,text'."),
             4: "Attempting to classify category that is not defined.",
             5: "More categories are defined than are present.",
             6: "Category only has one class in the training set."
-        }[error_code])
+        }[error_code]))
         sys.exit(error_code)
 
     def init(self, n, unk, string=None):
@@ -100,7 +100,7 @@ class Ngrams:
             punct = (string.punctuation.replace("?", "").replace("'", "").
                                         replace("!", "").replace(".", ""))
             with open(filename, 'r') as text:
-                tokens = unicode(text.read(), errors='replace')
+                tokens = str(text.read(), errors='replace')
 
         else:
             range_wrap = range
@@ -187,7 +187,7 @@ class Ngrams:
                 self.train_len = len(tokens)
             return tokens, string
 
-        tokens = list_wrap(filter(bool, string.split('\n')))
+        tokens = list_wrap(list(filter(bool, string.split('\n'))))
         tokens[-1] = tokens[-1].strip()
         # Put the leftover start tokens in the beginning
         if tokens[-1][-len(self.start_token):] == self.start_token:
@@ -250,8 +250,8 @@ class Ngrams:
 
         if unk:
             unk_words = set()
-            items = (word_freq_pairs.iteritems() if self.python2 else
-                     word_freq_pairs.items())
+            items = (iter(word_freq_pairs.items()) if self.python2 else
+                     list(word_freq_pairs.items()))
             for word, count in items:
                 if count <= self.threshold:
                     unk_words.add(word)
@@ -268,7 +268,7 @@ class Ngrams:
 
     def top_lvl_unk_tokenize(self, total_words, tokens):
         unk_words = set()
-        itms = total_words.iteritems() if self.python2 else total_words.items()
+        itms = iter(total_words.items()) if self.python2 else list(total_words.items())
         for word, count in itms:
             if count <= self.threshold:
                 unk_words.add(word)
@@ -291,10 +291,10 @@ class Ngrams:
         while stack:
             tmp_pairs, n = stack.pop()
             if n == 2:
-                values = (tmp_pairs.itervalues() if self.python2 else
-                          tmp_pairs.values())
+                values = (iter(tmp_pairs.values()) if self.python2 else
+                          list(tmp_pairs.values()))
                 for nxt_lvl_dict in values:
-                    for word, count in list_wrap(nxt_lvl_dict.items()):
+                    for word, count in list_wrap(list(nxt_lvl_dict.items())):
                         if (count <= self.threshold and
                                 word != self.unk_token):
                             del nxt_lvl_dict[word]
@@ -396,7 +396,7 @@ class Ngrams:
     """
     def unsmoothed_unigrams(self, word_freq_pairs):
         prob_dict = word_freq_pairs
-        items = prob_dict.iteritems() if self.python2 else prob_dict.items()
+        items = iter(prob_dict.items()) if self.python2 else list(prob_dict.items())
         for word, count in items:
             prob_dict[word] = count / self.total_words
 
@@ -404,10 +404,10 @@ class Ngrams:
 
     def unsmoothed_bigrams(self, word_freq_pairs):
         prob_dict = word_freq_pairs
-        items = prob_dict.iteritems() if self.python2 else prob_dict.items()
+        items = iter(prob_dict.items()) if self.python2 else list(prob_dict.items())
         for word, nxt_lvl_dict in items:
-            nxt_lvl_items = (nxt_lvl_dict.iteritems() if self.python2 else
-                             nxt_lvl_dict.items())
+            nxt_lvl_items = (iter(nxt_lvl_dict.items()) if self.python2 else
+                             list(nxt_lvl_dict.items()))
             for word_infront, cnt in nxt_lvl_items:
                 nxt_lvl_dict[word_infront] = cnt / self.total_words[word]
 
@@ -416,11 +416,11 @@ class Ngrams:
     def unsmoothed_ngrams(self, word_freq_pairs, total_words, n):
         prob_dict = word_freq_pairs
         if n == 2:
-            items = (prob_dict.iteritems() if self.python2 else
-                     prob_dict.items())
+            items = (iter(prob_dict.items()) if self.python2 else
+                     list(prob_dict.items()))
             for word, nxt_lvl_dict in items:
-                nxt_lvl_items = (nxt_lvl_dict.iteritems() if self.python2 else
-                                 nxt_lvl_dict.items())
+                nxt_lvl_items = (iter(nxt_lvl_dict.items()) if self.python2 else
+                                 list(nxt_lvl_dict.items()))
                 for word_infront, count in nxt_lvl_items:
                     nxt_lvl_dict[word_infront] = count / total_words[word]
             return
@@ -435,7 +435,7 @@ class Ngrams:
     """
     def laplace_unigrams(self, word_freq_pairs, total_words, V):
         prob_dict = word_freq_pairs
-        items = prob_dict.iteritems() if self.python2 else prob_dict.items()
+        items = iter(prob_dict.items()) if self.python2 else list(prob_dict.items())
         for word, count in items:
             prob_dict[word] = (count+self.alpha) / (total_words+V)
 
@@ -451,11 +451,11 @@ class Ngrams:
         while stack:
             word_freq_pairs, total_words, my_n = stack.pop()
             if my_n == 2:
-                items = (word_freq_pairs.iteritems() if self.python2 else
-                         word_freq_pairs.items())
+                items = (iter(word_freq_pairs.items()) if self.python2 else
+                         list(word_freq_pairs.items()))
                 for top_word, nxt_lvl_dict in items:
-                    nxt_lvl_items = (nxt_lvl_dict.iteritems() if self.python2
-                                     else nxt_lvl_dict.items())
+                    nxt_lvl_items = (iter(nxt_lvl_dict.items()) if self.python2
+                                     else list(nxt_lvl_dict.items()))
                     for bot_word, cnt in nxt_lvl_items:
                         nxt_lvl_dict[bot_word] = ((cnt+alpha) /
                                                   (total_words[top_word]+V))
@@ -476,15 +476,15 @@ class Ngrams:
     def occurrenceToUniTuring(self, word_freq_pairs, total_words):
         if self.python2:
             range_wrap = xrange
-            values = word_freq_pairs.itervalues()
+            values = iter(word_freq_pairs.values())
         else:
             range_wrap = range
-            values = word_freq_pairs.values()
+            values = list(word_freq_pairs.values())
 
         occurence_map = OrderedDict.fromkeys(range_wrap(1, max(values)+2), 0)
 
-        values = (word_freq_pairs.itervalues() if self.python2 else
-                  word_freq_pairs.values())
+        values = (iter(word_freq_pairs.values()) if self.python2 else
+                  list(word_freq_pairs.values()))
         for value in values:
             occurence_map[value] += 1
         if word_freq_pairs[self.unk_token] <= self.threshold:
@@ -493,7 +493,7 @@ class Ngrams:
         #fill in the levels with 0 words
         last_val = 1
         list_wrap = (lambda x: x) if self.python2 else list
-        for key, value in reversed(list_wrap(occurence_map.items())):
+        for key, value in reversed(list_wrap(list(occurence_map.items()))):
             if not value:
                 occurence_map[key] = last_val
             last_val = occurence_map[key]
@@ -503,7 +503,7 @@ class Ngrams:
 
     def goodTuringSmoothUni(self, word_freq_pairs, uni_ocm, total_words):
         prob_dict = word_freq_pairs
-        items = prob_dict.iteritems() if self.python2 else prob_dict.items()
+        items = iter(prob_dict.items()) if self.python2 else list(prob_dict.items())
         for word, count in items:
             prob_dict[word] = ((count+1) * uni_ocm[count+1] / uni_ocm[count] /
                                total_words)
@@ -514,27 +514,27 @@ class Ngrams:
         if self.python2:
             list_wrap = lambda x: x
             range_wrap = xrange
-            keys = word_freq_pairs.iterkeys()
+            keys = iter(word_freq_pairs.keys())
         else:
             list_wrap = list
             range_wrap = range
-            keys = word_freq_pairs.keys()
+            keys = list(word_freq_pairs.keys())
 
         unk_token = self.unk_token
         occurence_map = dict.fromkeys(keys)
 
-        items = (word_freq_pairs.iteritems() if self.python2 else
-                 word_freq_pairs.items())
+        items = (iter(word_freq_pairs.items()) if self.python2 else
+                 list(word_freq_pairs.items()))
         for wrd, nxt_lvl_dict in items:
             if nxt_lvl_dict:
-                nxt_lvl_vals = (nxt_lvl_dict.itervalues() if self.python2 else
-                                nxt_lvl_dict.values())
+                nxt_lvl_vals = (iter(nxt_lvl_dict.values()) if self.python2 else
+                                list(nxt_lvl_dict.values()))
                 top = max(nxt_lvl_vals)
                 occurence_map[wrd] = OrderedDict.fromkeys(range_wrap(1, top+2),
                                                           0)
 
-                nxt_lvl_vals = (nxt_lvl_dict.itervalues() if self.python2 else
-                                nxt_lvl_dict.values())
+                nxt_lvl_vals = (iter(nxt_lvl_dict.values()) if self.python2 else
+                                list(nxt_lvl_dict.values()))
                 for value in nxt_lvl_vals:
                     occurence_map[wrd][value] += 1
             else:
@@ -544,7 +544,7 @@ class Ngrams:
 
             # Fills in the levels with 0 words
             last_val = 1
-            for occur, cnt in reversed(list_wrap(occurence_map[wrd].items())):
+            for occur, cnt in reversed(list_wrap(list(occurence_map[wrd].items()))):
                 if not cnt:
                     occurence_map[wrd][occur] = last_val
                 else:
@@ -555,10 +555,10 @@ class Ngrams:
 
     def goodTuringSmoothBi(self, word_freq_pairs, total_words, bi_ocm):
         prob_dict = word_freq_pairs
-        items = prob_dict.iteritems() if self.python2 else prob_dict.items()
+        items = iter(prob_dict.items()) if self.python2 else list(prob_dict.items())
         for w, nxt_lvl_dict in items:
-            nxt_lvl_items = (nxt_lvl_dict.iteritems() if self.python2 else
-                             nxt_lvl_dict.items())
+            nxt_lvl_items = (iter(nxt_lvl_dict.items()) if self.python2 else
+                             list(nxt_lvl_dict.items()))
             for w_infront, cnt in nxt_lvl_items:
                 nxt_lvl_dict[w_infront] = ((cnt+1) * bi_ocm[w][cnt+1] /
                                            bi_ocm[w][cnt] / total_words[w])
@@ -573,9 +573,9 @@ class Ngrams:
 
         s = 0.0
         key = ""
-        values = tmp_dict.itervalues() if self.python2 else tmp_dict.values()
+        values = iter(tmp_dict.values()) if self.python2 else list(tmp_dict.values())
         r = random.uniform(0, sum(values))
-        items = tmp_dict.iteritems() if self.python2 else tmp_dict.items()
+        items = iter(tmp_dict.items()) if self.python2 else list(tmp_dict.items())
         for key, weight in items:
             s += weight
             if r < s:
@@ -775,7 +775,7 @@ def parse_args():
         warning_str = ("Warning: program may crash at such a high N. "
                        "Continue? (Y/n) ")
         while True:
-            cont = input(warning_str)
+            cont = eval(input(warning_str))
             if (cont == 'n') or (cont == 'N'):
                 if error_str:
                     error_str += "                  "
@@ -832,7 +832,7 @@ def main():
             perplexity = model.bi_perplex(test_t, gts)
         else:
             perplexity = model.n_laplace_perplex_help(test_t, n)
-        print("Perplexity: " + str(perplexity))
+        print(("Perplexity: " + str(perplexity)))
 
     if opts.bleu:
         inp = open(opts.training_set, 'r')
@@ -841,7 +841,7 @@ def main():
         opt_text = opt.readlines()
         #x = [[a.split()] for a in inp_text]
         #print x
-        print "Corpus standard BLEU score = ", float(tr.bleu_score.corpus_bleu([a.split() for a in inp_text], [b.split() for b in opt_text]))
+        print("Corpus standard BLEU score = ", float(tr.bleu_score.corpus_bleu([a.split() for a in inp_text], [b.split() for b in opt_text])))
         ctr = 0.0
         bleu_scorer_std = 0.0
         bleu_scorer_modpres = 0.0
@@ -852,7 +852,7 @@ def main():
             bleu_scorer_std += score
             #bleu_scorer_modpres ++ tr.bleu_score.modified_precision(x.split(), y.split(), 4)
             ctr += 1
-        print "Averaged standard BLEU score from sentence average = ", float(bleu_scorer_std / ctr)
+        print("Averaged standard BLEU score from sentence average = ", float(bleu_scorer_std / ctr))
 
 if __name__ == '__main__':
     main()

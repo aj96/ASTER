@@ -8,7 +8,8 @@ from nltk.corpus import wordnet as wn
 from numpy.random import choice
 import copy
 import sys
-reload(sys)
+import importlib
+importlib.reload(sys)
 sys.setdefaultencoding('utf8')
 
 parser = argparse.ArgumentParser(description='Create files of events')

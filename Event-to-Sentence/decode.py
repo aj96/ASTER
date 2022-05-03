@@ -33,9 +33,9 @@ class BeamSearchDecoder(object):
         self._load_model()
 
     def _load_model(self):
-        print 'Loading pretrained model'
+        print('Loading pretrained model')
         if self.config['model']['seq2seq'] == 'vanilla':
-            print 'Loading Seq2Seq Vanilla model'
+            print('Loading Seq2Seq Vanilla model')
 
             self.model = Seq2Seq(
                 src_emb_dim=self.config['model']['dim_word_src'],
@@ -54,7 +54,7 @@ class BeamSearchDecoder(object):
             ).cuda()
 
         elif self.config['model']['seq2seq'] == 'attention':
-            print 'Loading Seq2Seq Attention model'
+            print('Loading Seq2Seq Attention model')
 
             self.model = Seq2SeqAttention(
                 src_emb_dim=self.config['model']['dim_word_src'],
@@ -77,7 +77,7 @@ class BeamSearchDecoder(object):
         self.model.load_state_dict(torch.load(
             open(self.model_weights)
         ))
-        print "Model loaded"
+        print("Model loaded")
 
     def get_hidden_representation(self, input):
         """Get hidden representation for a sentence."""
@@ -232,7 +232,7 @@ class BeamSearchDecoder(object):
             scores, ks = beam[b].sort_best()
 
             allScores += [scores[:n_best]]
-            hyps = zip(*[beam[b].get_hyp(k) for k in ks[:n_best]])
+            hyps = list(zip(*[beam[b].get_hyp(k) for k in ks[:n_best]]))
             allHyp += [hyps]
 
         return allHyp, allScores
@@ -241,7 +241,7 @@ class BeamSearchDecoder(object):
         """Translate the whole dataset."""
         trg_preds = []
         trg_gold = []
-        for j in xrange(
+        for j in range(
             0, len(self.src['data']),
             self.config['data']['batch_size']
         ):
@@ -274,7 +274,7 @@ class BeamSearchDecoder(object):
             trg_preds += all_preds
             trg_gold += all_gold
             for p in all_preds:
-                print p.replace('</s>', '').strip()
+                print(p.replace('</s>', '').strip())
             #all_preds = ' '.join(all_preds)#.replace('</s>', '|')
             #all_gold = ' '.join(all_gold)
             #print len(all_preds.split('</s>'))
@@ -314,9 +314,9 @@ class GreedyDecoder(object):
         self._load_model()
 
     def _load_model(self):
-        print 'Loading pretrained model'
+        print('Loading pretrained model')
         if self.config['model']['seq2seq'] == 'vanilla':
-            print 'Loading Seq2Seq Vanilla model'
+            print('Loading Seq2Seq Vanilla model')
 
             self.model = Seq2Seq(
                 src_emb_dim=self.config['model']['dim_word_src'],
@@ -335,7 +335,7 @@ class GreedyDecoder(object):
             ).cuda()
 
         elif self.config['model']['seq2seq'] == 'attention':
-            print 'Loading Seq2Seq Attention model'
+            print('Loading Seq2Seq Attention model')
 
             self.model = Seq2SeqAttention(
                 src_emb_dim=self.config['model']['dim_word_src'],
@@ -366,7 +366,7 @@ class GreedyDecoder(object):
         output_lines_trg_gold
     ):
         """Decode a minibatch."""
-        for i in xrange(self.config['data']['max_trg_length']):
+        for i in range(self.config['data']['max_trg_length']):
 
             decoder_logit = self.model(input_lines_src, input_lines_trg)
             word_probs = self.model.decode(decoder_logit)
@@ -386,12 +386,12 @@ class GreedyDecoder(object):
         """Evaluate model."""
         preds = []
         ground_truths = []
-        for j in xrange(
+        for j in range(
             0, len(self.src['data']),
             self.config['data']['batch_size']
         ):
 
-            print 'Decoding : %d out of %d ' % (j, len(self.src['data']))
+            print('Decoding : %d out of %d ' % (j, len(self.src['data'])))
             # Get source minibatch
             input_lines_src, output_lines_src, lens_src, mask_src = (
                 get_minibatch(
@@ -424,7 +424,7 @@ class GreedyDecoder(object):
             input_lines_trg = Variable(torch.LongTensor(
                 [
                     [trg['word2id']['<s>']]
-                    for i in xrange(input_lines_src.size(0))
+                    for i in range(input_lines_src.size(0))
                 ]
             ), volatile=True).cuda()
 
@@ -466,7 +466,7 @@ class GreedyDecoder(object):
                     index = len(sentence_real)
 
                 ground_truths.append(['<s>'] + sentence_real[:index + 1])
-                print preds
+                print(preds)
                 #TODO fix sentence markers
                 #all_preds = ' '.join(preds)#.replace('</s>', '|')
                 #all_gold = ' '.join(ground_truths)
@@ -478,10 +478,10 @@ class GreedyDecoder(object):
         bleu_score = get_bleu(preds, ground_truths)
 
         for pred, truth in zip(preds, ground_truths):
-            print 'Pred:' + ' '.join([a for a in pred])
-            print 'Truth:' + ' '.join([a for a in ground_truths])
+            print('Pred:' + ' '.join([a for a in pred]))
+            print('Truth:' + ' '.join([a for a in ground_truths]))
 
-        print 'BLEU score : %.5f ' % (bleu_score)
+        print('BLEU score : %.5f ' % (bleu_score))
 
 def pipeline_predict(src, config, trg=None):
     config = read_config(config)

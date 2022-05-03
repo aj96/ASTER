@@ -46,7 +46,7 @@ console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
 
 
-print 'Reading data ...'
+print('Reading data ...')
 
 src, trg = read_nmt_data(
     src=config['data']['src'],
@@ -164,13 +164,13 @@ elif config['training']['optimizer'] == 'sgd':
 else:
     raise NotImplementedError("Learning method not recommend for task")
 
-for i in xrange(config['training']['epochs']):
+for i in range(config['training']['epochs']):
     if i > 5:
         lr /= 2
 
     logging.info("Learning rate is: %0.3f" % lr)
     losses = []
-    for j in xrange(0, len(src['data']), batch_size):
+    for j in range(0, len(src['data']), batch_size):
 
         input_lines_src, _, lens_src, mask_src = get_minibatch(
             src['data'], src['word2id'], j,
@@ -188,7 +188,7 @@ for i in xrange(config['training']['epochs']):
             decoder_logit.contiguous().view(-1, trg_vocab_size),
             output_lines_trg.view(-1)
         )
-        losses.append(loss.data[0])
+        losses.append(loss.item())
         loss.backward()
         optimizer.step()
 

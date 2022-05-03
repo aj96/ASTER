@@ -287,7 +287,7 @@ class LSTMAttention(nn.Module):
         )
 
         output = []
-        steps = range(input.size(0))
+        steps = list(range(input.size(0)))
         for i in steps:
             hidden = recurrence(
                 input[i], hidden, projected_input[i], projected_ctx
@@ -379,7 +379,7 @@ class LSTMAttentionDot(nn.Module):
             input = input.transpose(0, 1)
 
         output = []
-        steps = range(input.size(0))
+        steps = list(range(input.size(0)))
         for i in steps:
             hidden = recurrence(input[i], hidden)
             output.append(isinstance(hidden, tuple) and hidden[0])

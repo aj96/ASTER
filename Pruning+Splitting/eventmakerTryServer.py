@@ -457,7 +457,7 @@ class eventMaker:
 line = "There is an unguarded exit to the east."
 maker = eventMaker(line)
 maker.getEvent()
-print(maker.events)
+print((maker.events))
 output = []
 quit()
 for event in maker.events:
